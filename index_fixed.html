@@ -1,0 +1,589 @@
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Llantas del Pacífico — Cotización de Propuestas</title>
+<style>
+  :root{--bg:#0d0f14;--surf:#161a22;--surf2:#1e2430;--bord:#2a3040;--acc:#e8a020;--acc2:#f0c060;--txt:#d8dde8;--dim:#7a8599;--grn:#2db87a;--red:#e05050;--blu:#4a90d9;}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:Arial,sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;font-size:14px}
+  header{background:var(--surf);border-bottom:2px solid var(--acc);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+  .logo{font-family:'Arial Narrow',Arial,sans-serif;font-size:20px;font-weight:800;color:var(--acc);text-transform:uppercase;letter-spacing:1px}
+  .logo span{color:var(--txt)}
+  .hm{font-size:11px;color:var(--dim);text-align:right;line-height:1.6}
+  .hm strong{color:var(--acc2)}
+  main{max-width:1060px;margin:0 auto;padding:24px 20px}
+
+  /* TOKEN PANEL — solo para guardar */
+  .tokpanel{background:var(--surf2);border:1px solid var(--bord);border-radius:8px;padding:14px 20px;margin-bottom:20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .tokpanel.conn{border-color:rgba(45,184,122,.4)}
+  .tokpanel h4{font-family:'Arial Narrow',Arial,sans-serif;font-size:14px;font-weight:700;margin-bottom:2px}
+  .tokpanel p{font-size:11px;color:var(--dim)}
+  .tokpanel a{color:var(--blu)}
+  .ti2{background:var(--surf);border:1px solid var(--bord);border-radius:6px;color:var(--txt);padding:7px 12px;font-family:Arial,sans-serif;font-size:12px;width:280px;outline:none}
+  .ti2:focus{border-color:var(--acc)}
+  .cbtn{background:var(--acc);color:#0d0f14;border:none;border-radius:6px;padding:7px 16px;font-family:'Arial Narrow',Arial,sans-serif;font-size:13px;font-weight:700;cursor:pointer;text-transform:uppercase;letter-spacing:.5px;transition:all .2s;white-space:nowrap}
+  .cbtn:hover{background:var(--acc2)}
+  .connbadge{font-size:12px;color:var(--grn);font-weight:600;display:none}
+  .connbadge.show{display:block}
+
+  /* STATS */
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px}
+  .sc{background:var(--surf);border:1px solid var(--bord);border-radius:8px;padding:12px 16px;text-align:center}
+  .sc .n{font-family:'Arial Narrow',Arial,sans-serif;font-size:28px;font-weight:700;color:var(--acc);line-height:1}
+  .sc .l{font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:.5px;margin-top:3px}
+
+  /* FILTERS */
+  .filt{display:flex;align-items:center;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+  .filt input{background:var(--surf);border:1px solid var(--bord);border-radius:6px;color:var(--txt);padding:7px 12px;font-family:Arial,sans-serif;font-size:13px;width:230px;outline:none}
+  .filt input:focus{border-color:var(--acc)}
+  .fb{background:var(--surf2);border:1px solid var(--bord);color:var(--dim);border-radius:5px;padding:6px 12px;font-family:Arial,sans-serif;font-size:11px;cursor:pointer;transition:all .2s;text-transform:uppercase;letter-spacing:.5px}
+  .fb.on,.fb:hover{border-color:var(--acc);color:var(--acc);background:rgba(232,160,32,.07)}
+
+  /* CARDS */
+  .grid{display:flex;flex-direction:column;gap:10px}
+  .card{background:var(--surf);border:1px solid var(--bord);border-radius:10px;overflow:hidden;transition:border-color .2s}
+  .card:hover{border-color:rgba(232,160,32,.35)}
+  .card.done{border-left:3px solid var(--grn)}
+  .card.pend{border-left:3px solid var(--acc)}
+  .ch{display:grid;grid-template-columns:1fr auto;align-items:center;padding:13px 18px;cursor:pointer;gap:10px}
+  .chl{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .bcod{font-family:'Arial Narrow',Arial,sans-serif;font-size:11px;font-weight:600;background:rgba(232,160,32,.1);border:1px solid rgba(232,160,32,.3);color:var(--acc);padding:2px 8px;border-radius:4px;white-space:nowrap}
+  .binst{font-family:'Arial Narrow',Arial,sans-serif;font-size:15px;font-weight:700}
+  .bmeta{font-size:11px;color:var(--dim)}
+  .bstat{font-size:10px;padding:2px 8px;border-radius:20px;font-weight:600;text-transform:uppercase}
+  .bstat.done{background:rgba(45,184,122,.15);color:var(--grn);border:1px solid rgba(45,184,122,.3)}
+  .bstat.pend{background:rgba(232,160,32,.1);color:var(--acc);border:1px solid rgba(232,160,32,.3)}
+  .ti{color:var(--dim);font-size:15px;transition:transform .2s;user-select:none}
+  .card.open .ti{transform:rotate(180deg)}
+  .cb{display:none;padding:0 18px 18px;border-top:1px solid var(--bord)}
+  .card.open .cb{display:block}
+
+  /* INFO BOX */
+  .infobox{background:var(--surf2);border:1px solid var(--bord);border-radius:6px;padding:10px 14px;margin-top:14px;font-size:12px;line-height:1.7}
+  .infobox .veh{color:var(--acc2);font-family:'Arial Narrow',Arial,sans-serif;font-size:14px;font-weight:700}
+  .infobox .lugar{color:var(--dim)}
+
+  /* ITEMS TABLE */
+  .itbl{width:100%;border-collapse:collapse;margin-top:12px;font-size:13px}
+  .itbl thead tr{background:var(--surf2)}
+  .itbl th{padding:8px 10px;text-align:left;font-family:'Arial Narrow',Arial,sans-serif;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--dim);border-bottom:1px solid var(--bord)}
+  .itbl td{padding:9px 10px;border-bottom:1px solid var(--bord);vertical-align:middle}
+  .itbl tr:last-child td{border-bottom:none}
+  .itbl tr:hover td{background:rgba(255,255,255,.02)}
+  .med{font-family:'Arial Narrow',Arial,sans-serif;font-size:16px;font-weight:700;color:var(--acc2)}
+  .spec{font-size:11px;color:var(--dim);margin-top:2px;line-height:1.4}
+  .qb{display:inline-block;background:var(--surf2);border:1px solid var(--bord);border-radius:4px;padding:2px 8px;font-family:'Arial Narrow',Arial,sans-serif;font-size:13px;font-weight:600;color:var(--dim)}
+  .piw{position:relative;display:flex;align-items:center}
+  .piw .pfx{position:absolute;left:9px;color:var(--dim);font-size:12px;pointer-events:none}
+  .pi{background:var(--surf2);border:1px solid var(--bord);border-radius:5px;color:var(--txt);padding:6px 8px 6px 22px;font-family:Arial,sans-serif;font-size:12px;width:120px;outline:none;transition:border-color .2s}
+  .pi:focus{border-color:var(--acc)}
+  .pi.ok{border-color:rgba(45,184,122,.5);background:rgba(45,184,122,.05)}
+
+  /* EXTRAS */
+  .extras{margin-top:12px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+  .fg{display:flex;flex-direction:column;gap:4px}
+  .fg label{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--dim);font-family:'Arial Narrow',Arial,sans-serif;font-weight:700}
+  .pifull{background:var(--surf2);border:1px solid var(--bord);border-radius:5px;color:var(--txt);padding:6px 8px 6px 22px;font-family:Arial,sans-serif;font-size:12px;width:100%;outline:none;transition:border-color .2s}
+  .pifull:focus{border-color:var(--acc)}
+  .pifull.ok{border-color:rgba(45,184,122,.5);background:rgba(45,184,122,.05)}
+  .cifull{background:var(--surf2);border:1px solid var(--bord);border-radius:5px;color:var(--txt);padding:6px 8px;font-family:Arial,sans-serif;font-size:12px;width:100%;outline:none;transition:border-color .2s;resize:none}
+  .cifull:focus{border-color:var(--acc)}
+  .cifull.ok{border-color:rgba(45,184,122,.5);background:rgba(45,184,122,.05)}
+
+  /* BTNS */
+  .fbtns{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:14px}
+  .savebtn{background:var(--acc);color:#0d0f14;border:none;border-radius:6px;padding:8px 20px;font-family:'Arial Narrow',Arial,sans-serif;font-size:13px;font-weight:700;cursor:pointer;text-transform:uppercase;transition:all .2s}
+  .savebtn:hover{background:var(--acc2);transform:translateY(-1px)}
+  .savebtn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+  .donebn{background:transparent;border:1px solid var(--grn);color:var(--grn);border-radius:6px;padding:8px 16px;font-family:'Arial Narrow',Arial,sans-serif;font-size:12px;font-weight:700;cursor:pointer;text-transform:uppercase;transition:all .2s}
+  .donebn:hover{background:rgba(45,184,122,.1)}
+  .sfb{font-size:12px;color:var(--grn);opacity:0;transition:opacity .3s}
+  .sfb.show{opacity:1}
+
+  .urg-h{color:var(--red);font-weight:700;font-size:11px}
+  .urg-m{color:var(--acc2);font-size:11px}
+  .badge-tipo{font-size:10px;color:var(--blu);background:rgba(74,144,217,.1);border:1px solid rgba(74,144,217,.3);border-radius:4px;padding:2px 7px}
+  .badge-LE{font-size:10px;color:#c084fc;background:rgba(192,132,252,.1);border:1px solid rgba(192,132,252,.3);border-radius:4px;padding:2px 7px;font-family:'Arial Narrow',Arial,sans-serif;font-weight:700}
+
+  .toast{position:fixed;bottom:20px;right:20px;padding:10px 16px;border-radius:8px;font-family:'Arial Narrow',Arial,sans-serif;font-weight:700;font-size:13px;z-index:1000;transform:translateY(70px);opacity:0;transition:all .3s;box-shadow:0 4px 16px rgba(0,0,0,.4)}
+  .toast.show{transform:translateY(0);opacity:1}
+  .toast.s{background:var(--grn);color:#0d0f14}
+  .toast.e{background:var(--red);color:#fff}
+  .empty{text-align:center;padding:50px;color:var(--dim)}
+  @media(max-width:768px){.stats{grid-template-columns:repeat(2,1fr)}.extras{grid-template-columns:1fr 1fr}.itbl{display:block;overflow-x:auto}header{flex-direction:column;gap:8px;text-align:center}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">LLANTAS <span>DEL PACÍFICO</span> &nbsp;·&nbsp; <span style="color:var(--dim);font-weight:300;font-size:14px">Cotización de Propuestas</span></div>
+  <div class="hm">Plan de Postulación · <strong>29 abril 2026 en adelante</strong><br><span id="upd" style="color:var(--dim)">Detalle extraído vía LicitaLab</span></div>
+</header>
+
+<main>
+  <!-- TOKEN para guardar -->
+  <div class="tokpanel" id="tokpanel">
+    <div style="font-size:22px">🔑</div>
+    <div style="flex:1;min-width:160px">
+      <h4 id="tokT">Token Google Sheets (para guardar precios)</h4>
+      <p>Las propuestas ya están cargadas. El token solo se necesita al hacer clic en "Guardar en planilla".<br>
+      <a href="https://developers.google.com/oauthplayground" target="_blank">Obtener token → OAuth Playground</a> · scope: spreadsheets</p>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <input type="password" class="ti2" id="tok" placeholder="ya29.xxxxxxxxxxxxx">
+      <button class="cbtn" onclick="setTok()">✓ Confirmar</button>
+      <span class="connbadge" id="connbadge">✓ Token listo</span>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="sc"><div class="n" id="sT">0</div><div class="l">Propuestas activas</div></div>
+    <div class="sc"><div class="n" id="sU" style="color:var(--red)">0</div><div class="l">Urgentes ≤2 días</div></div>
+    <div class="sc"><div class="n" id="sC" style="color:var(--grn)">0</div><div class="l">Cotizadas</div></div>
+    <div class="sc"><div class="n" id="sP" style="color:var(--acc)">0</div><div class="l">Pendientes</div></div>
+  </div>
+
+  <!-- FILTERS -->
+  <div class="filt">
+    <input type="text" id="q" placeholder="🔍  Buscar institución, ID, región..." oninput="render()">
+    <button class="fb on" id="btnTodas" onclick="sf('todas')">Todas</button>
+    <button class="fb" id="btnPendientes" onclick="sf('pendientes')">Sin cotizar</button>
+    <button class="fb" id="btnCotizadas" onclick="sf('cotizadas')">Cotizadas</button>
+    <button class="fb" id="btnUrgentes" onclick="sf('urgentes')">🔴 Urgentes</button>
+  </div>
+
+  <div class="grid" id="grid"></div>
+</main>
+<div class="toast" id="toast"></div>
+
+<script>
+const SID_PREC = '1Slxc3saUt-FXCPHzE58GEsDFUemkECk2P36zWD2YLCY';
+let tok = localStorage.getItem('llp_tok')||'';
+let fil = 'todas';
+let cache = (()=>{try{return JSON.parse(localStorage.getItem('llp_pc')||'{}')}catch(e){return{}}})();
+
+// ── DATOS DE PROPUESTAS (extraídos del plan de postulación + LicitaLab) ──────
+const PROPUESTAS = [
+  {
+    id:'837-157-COT26', org:'Servicio Médico Legal — Puerto Natales', reg:'Magallanes',
+    monto:'$1.200.000', cierre:'Mié 29/04 15:00', tipo:'Ágil 1°', urg:'high',
+    vehiculo:'Nissan NP300 SC — Patente GYKK-25 (año 2016)', lugar:'Av. Carlos Ibáñez 1710, Puerto Natales',
+    plazo:'5 días hábiles desde OC', servReq:'Desmontaje + Montaje + Alineación + Rotación + Balanceo + Válvulas nuevas (en Puerto Natales)',
+    items:[
+      {medida:'205/75R15', qty:5, desc:'CON CLAVOS · IC mín. 97 (730 kg) · Vel. S (180 km/h) · Load Range D · Tracción on/off · Garantía mín. 3 años · Cert. DOT/ECE/ISO'},
+    ]
+  },
+  {
+    id:'3636-75-COT26', org:'I. Municipalidad de Malloa — CESFAM', reg:"O'Higgins",
+    monto:'$800.000', cierre:'Mié 29/04 16:00', tipo:'Ágil 1°', urg:'high',
+    vehiculo:'Suzuki Celerio — CESFAM Malloa', lugar:'Malloa',
+    plazo:'Inmediato (mismo día)', servReq:'Instalación + Rotación + Alineación + Balanceo',
+    items:[
+      {medida:'165/70R14', qty:2, desc:'Radial pavimento · IC mín. 81 · Vel. mín. T · País origen: Corea · Fabricación ≤ 12 meses · Garantía mín. 6 meses'},
+    ]
+  },
+  {
+    id:'4778-68-COT26', org:'Hospital de Coyhaique — SNS', reg:'Aysén',
+    monto:'$679.000', cierre:'Mié 29/04 16:00', tipo:'Ágil 1°', urg:'high',
+    vehiculo:'Furgón institucional Hospital Coyhaique', lugar:'Coyhaique',
+    plazo:'—', servReq:'Cotizar separado si aplica instalación',
+    items:[
+      {medida:'215/70R16', qty:2, desc:'SIN clavos'},
+      {medida:'215/70R16', qty:4, desc:'CON CLAVOS (invierno)'},
+    ]
+  },
+  {
+    id:'1388974-122-COT26', org:'CMC Ramón Freire — Educación', reg:'Los Lagos',
+    monto:'$1.400.000', cierre:'Mié 29/04 16:00', tipo:'Ágil 1°', urg:'high',
+    vehiculo:'Toyota Hilux 2025 (pick-up)', lugar:'Región de Los Lagos',
+    plazo:'—', servReq:'Instalación incluida en precio',
+    items:[
+      {medida:'235/55R17', qty:2, desc:'103W Extra Load · ROADX Outsider o equivalente'},
+      {medida:'225/75R16C', qty:4, desc:'118/116R · Cargo Marathon 2 Goodyear o equivalente'},
+    ]
+  },
+  {
+    id:'1305552-43-COT26', org:'SLEP Tamarugal — Educación', reg:'Tarapacá',
+    monto:'$4.000.000', cierre:'Mié 29/04 18:00', tipo:'Ágil 1°', urg:'high',
+    vehiculo:'Vehículos institucionales SLEP Tamarugal (20 unidades)', lugar:'Pozo Almonte, Tarapacá',
+    plazo:'—', servReq:'Instalación en dependencias SLEP',
+    items:[
+      {medida:'205/75R16', qty:4, desc:''},
+      {medida:'235/70R16', qty:2, desc:''},
+      {medida:'195/70R15', qty:4, desc:''},
+      {medida:'235/70R16', qty:4, desc:'(segunda línea)'},
+      {medida:'215/75R17.5', qty:6, desc:'Camión'},
+    ]
+  },
+  {
+    id:'3506-40-LE26', org:'I. Municipalidad de Tocopilla', reg:'Antofagasta',
+    monto:'$34.500.000', cierre:'Mié 29/04 19:00', tipo:'LE ⭐⭐⭐⭐⭐', urg:'high',
+    vehiculo:'Flota vehicular completa Municipalidad Tocopilla', lugar:'Aníbal Pinto 1305, Tocopilla',
+    plazo:'15–20 días corridos (puntaje máximo)', servReq:'Solo suministro — despacho a Municipalidad',
+    items:[
+      {medida:'295/80R22.5 DIR', qty:8,  desc:'Equiv. Westlake · Camiones TFY29, TFY30, JYYW16, JLVK54'},
+      {medida:'295/80R22.5 TRAC',qty:32, desc:'Equiv. Westlake · Camiones TFY29, TFY30, JYYW16, JLVK54'},
+      {medida:'275/80R22.5 DIR', qty:12, desc:'Equiv. Westlake · Camiones TFY24-27, TFY31, LPHD18'},
+      {medida:'275/80R22.5 TRAC',qty:34, desc:'Equiv. Westlake · Camiones TFY24-27, TFY31, LPHD18'},
+      {medida:'205/75R17.5 DIR', qty:2,  desc:'Equiv. Westlake · Camión ¾'},
+      {medida:'205/75R17.5 TRAC',qty:4,  desc:'Equiv. Westlake · Camión ¾'},
+      {medida:'215/75R17.5 DIR', qty:2,  desc:'Equiv. Westlake · Bus LPHD19'},
+      {medida:'215/75R17.5 TRAC',qty:4,  desc:'Equiv. Westlake · Bus LPHD19'},
+      {medida:'20.5R25',         qty:4,  desc:'Equiv. Michelin · Cargador Caterpillar SXFX22'},
+      {medida:'20.5R25',         qty:4,  desc:'Equiv. Westlake · Cargador Komatsu LVGW86'},
+      {medida:'325/95R24 DIR',   qty:2,  desc:'Equiv. Westlake · Camión Tolva JLVK-54'},
+      {medida:'325/95R24 TRAC',  qty:8,  desc:'Equiv. Westlake · Camión Tolva JLVK-54'},
+    ]
+  },
+  {
+    id:'792899-3-COT26', org:'Superintendencia de Educación Atacama (2° llamado)', reg:'Atacama',
+    monto:'$1.200.000', cierre:'Mié 29/04 16:29', tipo:'Ágil 2°', urg:'high',
+    vehiculo:'—', lugar:'Copiapó, Atacama',
+    plazo:'—', servReq:'Verificar si aplica re-postulación (ya postulada en 1°)',
+    items:[
+      {medida:'Por confirmar', qty:0, desc:'2° llamado — revisar especificaciones en portal MP'},
+    ]
+  },
+  {
+    id:'821-15-COT26', org:'MOP DGOP — Coquimbo', reg:'Coquimbo',
+    monto:'$600.000', cierre:'Jue 30/04 09:00', tipo:'Ágil 1°', urg:'med',
+    vehiculo:'Camioneta fiscal MOP', lugar:'Coquimbo',
+    plazo:'—', servReq:'—',
+    items:[
+      {medida:'245/70R16', qty:4, desc:'107H · Camioneta fiscal MOP'},
+    ]
+  },
+  {
+    id:'5827-1-LE26', org:'JIS (repuestos ambulancia)', reg:'RM',
+    monto:'$10.326.024', cierre:'Jue 30/04 10:00', tipo:'LE ⭐⭐⭐', urg:'med',
+    vehiculo:'Ambulancia — JIS', lugar:'Región Metropolitana',
+    plazo:'—', servReq:'Incluye neumáticos entre otros repuestos',
+    items:[
+      {medida:'Por confirmar', qty:0, desc:'LE repuestos ambulancia — incluye neumáticos · 0 ofertas — revisar bases'},
+    ]
+  },
+  {
+    id:'870-49-COT26', org:'Comisión Nacional de Riego — Talca CNR', reg:'Maule',
+    monto:'$500.000', cierre:'Jue 30/04 12:00', tipo:'Ágil 1°', urg:'med',
+    vehiculo:'Vehículo zonal', lugar:'Talca',
+    plazo:'—', servReq:'—',
+    items:[
+      {medida:'Por confirmar', qty:4, desc:'Revisar especificaciones en portal MP'},
+    ]
+  },
+  {
+    id:'4137-25-COT26', org:'DGAC — Aeródromo Desierto Atacama', reg:'Atacama',
+    monto:'$750.000', cierre:'Jue 30/04 12:00', tipo:'Ágil 1°', urg:'med',
+    vehiculo:'Toyota Hilux Aeródromo', lugar:'Atacama',
+    plazo:'—', servReq:'—',
+    items:[
+      {medida:'225/70R17', qty:4, desc:'AT · Toyota Hilux'},
+    ]
+  },
+  {
+    id:'1272-5-COT26', org:'MOP DOP Coyhaique', reg:'Aysén',
+    monto:'$2.000.000', cierre:'Jue 30/04 15:00', tipo:'Ágil 1°', urg:'med',
+    vehiculo:'Vehículos MOP DOP', lugar:'Coyhaique',
+    plazo:'—', servReq:'Con clavos',
+    items:[
+      {medida:'265/70R17', qty:8, desc:'AT/MT CON CLAVOS · 2 proveedores actuales'},
+    ]
+  },
+  {
+    id:'4357-93-COT26', org:'I. Municipalidad de Freirina — CESFAM', reg:'Atacama',
+    monto:'$750.000', cierre:'Lun 04/05 08:00', tipo:'Ágil 1°', urg:'low',
+    vehiculo:'Camioneta CESFAM Freirina', lugar:'Freirina, Atacama',
+    plazo:'—', servReq:'—',
+    items:[
+      {medida:'Por confirmar', qty:0, desc:'Revisar especificaciones en portal MP'},
+    ]
+  },
+  {
+    id:'4170-34-LE26', org:'I. Municipalidad de Galvarino', reg:'Araucanía',
+    monto:'s/i', cierre:'Lun 04/05 15:01', tipo:'LE ⭐⭐⭐', urg:'low',
+    vehiculo:'Flota municipal Galvarino', lugar:'Galvarino, Araucanía',
+    plazo:'—', servReq:'—',
+    items:[
+      {medida:'Por confirmar', qty:0, desc:'LE neum. flota municipal — 0 ofertas — revisar bases'},
+    ]
+  },
+  {
+    id:'4735-6-LE26', org:'Municipalidad de Cholchol — DSM', reg:'Araucanía',
+    monto:'s/i', cierre:'Lun 04/05 15:05', tipo:'LE', urg:'low',
+    vehiculo:'Vehículos DSM Cholchol', lugar:'Cholchol, Araucanía',
+    plazo:'—', servReq:'Incluye insumos y repuestos',
+    items:[
+      {medida:'Por confirmar', qty:0, desc:'Revisar especificaciones en portal MP'},
+    ]
+  },
+  {
+    id:'2760-61-LE26', org:'I. Municipalidad de Coronel', reg:'Biobío',
+    monto:'$10.000.000', cierre:'Jue 07/05 15:00', tipo:'LE', urg:'low',
+    vehiculo:'Camiones + vehículos municipales Coronel', lugar:'Coronel, Biobío',
+    plazo:'—', servReq:'—',
+    items:[
+      {medida:'Por confirmar', qty:0, desc:'LE $10M — camiones + vehículos — revisar bases'},
+    ]
+  },
+  {
+    id:'2424-34-LE26', org:'I. Municipalidad de Viña del Mar', reg:'Valparaíso',
+    monto:'$30.000.000', cierre:'Jue 07/05 15:30', tipo:'LE ⭐⭐⭐', urg:'low',
+    vehiculo:'Camiones 09-1484-JFO', lugar:'Viña del Mar',
+    plazo:'—', servReq:'Kit neumáticos camiones',
+    items:[
+      {medida:'Por confirmar', qty:0, desc:'LE $30M — kit neumáticos camiones — revisar bases'},
+    ]
+  },
+];
+
+// Aplicar cache
+PROPUESTAS.forEach(p=>{
+  const c=cache[p.id]||{};
+  p.precioServ=c.precioServ||'';
+  p.flete=c.flete||'';
+  p.comentario=c.comentario||'';
+  p.itemPrecios=c.itemPrecios||{};
+  p.cotizada=c.cotizada||false;
+});
+
+// ── TOKEN ──────────────────────────────────────────────────────────────────
+function setTok(){
+  const v=document.getElementById('tok').value.trim();
+  if(!v){toast('Ingresa el token','e');return;}
+  tok=v;localStorage.setItem('llp_tok',tok);
+  document.getElementById('connbadge').classList.add('show');
+  document.getElementById('tokpanel').classList.add('conn');
+  document.getElementById('tokT').textContent='✓ Token configurado — listo para guardar';
+  toast('✓ Token guardado');
+}
+
+function toast(m,t='s'){const el=document.getElementById('toast');el.textContent=m;el.className=`toast ${t} show`;setTimeout(()=>el.classList.remove('show'),3500);}
+
+function apiFetch(url,opts={}){
+  return fetch(url,{...opts,headers:{'Authorization':`Bearer ${tok}`,'Content-Type':'application/json',...(opts.headers||{})}})
+    .then(async r=>{if(!r.ok){const e=await r.json();throw new Error(e.error?.message||'Error API');}return r.json();});
+}
+
+// ── STATS ──────────────────────────────────────────────────────────────────
+function stats(){
+  const t=PROPUESTAS.length;
+  const u=PROPUESTAS.filter(p=>p.urg==='high').length;
+  const c=PROPUESTAS.filter(p=>p.cotizada).length;
+  document.getElementById('sT').textContent=t;
+  document.getElementById('sU').textContent=u;
+  document.getElementById('sC').textContent=c;
+  document.getElementById('sP').textContent=t-c;
+}
+
+// ── FILTER ─────────────────────────────────────────────────────────────────
+function sf(f){
+  fil=f;
+  ['Todas','Pendientes','Cotizadas','Urgentes'].forEach(n=>document.getElementById('btn'+n).classList.toggle('on',f===n.toLowerCase()));
+  render();
+}
+
+// ── RENDER ─────────────────────────────────────────────────────────────────
+function render(){
+  const q=(document.getElementById('q').value||'').toLowerCase();
+  const lista=PROPUESTAS.filter(p=>{
+    const ms=!q||p.org.toLowerCase().includes(q)||p.id.toLowerCase().includes(q)||(p.reg||'').toLowerCase().includes(q);
+    let mf=true;
+    if(fil==='pendientes')mf=!p.cotizada;
+    else if(fil==='cotizadas')mf=p.cotizada;
+    else if(fil==='urgentes')mf=p.urg==='high';
+    return ms&&mf;
+  });
+  const g=document.getElementById('grid');
+  if(!lista.length){g.innerHTML='<div class="empty">No hay propuestas que coincidan.</div>';return;}
+  g.innerHTML=lista.map(cardHTML).join('');
+}
+
+function esc(s){return(s+'').replace(/'/g,"\\'")}
+
+function cardHTML(p){
+  const cl=p.cotizada?'done':'pend';
+  const st=p.cotizada?'Cotizada':'Pendiente';
+  const urgBadge=p.urg==='high'?`<span class="urg-h">🔴 URGENTE</span>`:p.urg==='med'?`<span class="urg-m">🟡 Próximo</span>`:'';
+  const esLE=p.tipo.includes('LE');
+
+  const itemRows=p.items.map((it,idx)=>{
+    const ip=p.itemPrecios[idx]||{};
+    const sinDet=it.medida==='Por confirmar';
+    return `<tr>
+      <td>
+        <div class="med">${it.medida}</div>
+        ${it.desc?`<div class="spec">${it.desc}</div>`:''}
+        ${sinDet?`<a href="https://www.mercadopublico.cl/Procurement/Modules/RFB/DetailsAcquisition.aspx?idlicitacion=${p.id}" target="_blank" style="font-size:11px;color:var(--blu)">Ver en Mercado Público →</a>`:''}
+      </td>
+      <td>${it.qty>0?`<span class="qb">${it.qty}</span>`:'—'}</td>
+      <td>
+        ${sinDet?'<span style="color:var(--dim);font-size:11px">Confirmar medida primero</span>':`
+        <div class="piw"><span class="pfx">$</span>
+        <input type="number" class="pi${ip.n?' ok':''}" value="${ip.n||''}" placeholder="0"
+          id="in_${p.id}_${idx}" oninput="dirty('${esc(p.id)}')">
+        </div>`}
+      </td>
+    </tr>`;
+  }).join('');
+
+  return `<div class="card ${cl}" id="card_${p.id}">
+    <div class="ch" onclick="tc('${esc(p.id)}')">
+      <div class="chl">
+        ${urgBadge}
+        <span class="bcod">${p.id}</span>
+        <span class="binst">${p.org}</span>
+        <span class="bmeta">${p.reg} · ${p.cierre} · ${p.monto}</span>
+        ${esLE?`<span class="badge-LE">${p.tipo}</span>`:`<span class="badge-tipo">${p.tipo}</span>`}
+        <span style="font-size:10px;color:var(--grn)">✓ ${p.items.length} ítem${p.items.length>1?'s':''}</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span class="bstat ${cl}">${st}</span>
+        <span class="ti">▾</span>
+      </div>
+    </div>
+    <div class="cb">
+
+      <!-- INFO -->
+      <div class="infobox">
+        <div class="veh">🚗 ${p.vehiculo}</div>
+        <div class="lugar">📍 ${p.lugar} &nbsp;·&nbsp; ⏱ Plazo: ${p.plazo}</div>
+        ${p.servReq&&p.servReq!=='—'?`<div style="margin-top:4px;color:var(--acc2)">🔧 Servicio requerido: ${p.servReq}</div>`:''}
+      </div>
+
+      <!-- TABLA NEUMÁTICOS -->
+      <table class="itbl">
+        <thead><tr>
+          <th>Medida / Especificación técnica</th>
+          <th>Cant.</th>
+          <th>Precio Neto Unitario</th>
+        </tr></thead>
+        <tbody>${itemRows}</tbody>
+      </table>
+
+      <!-- EXTRAS: servicio, flete, comentarios -->
+      <div class="extras" style="margin-top:14px">
+        <div class="fg">
+          <label>Precio Servicio total (M+B+A)</label>
+          <div class="piw"><span class="pfx">$</span>
+          <input type="number" class="pifull${p.precioServ?' ok':''}" value="${p.precioServ}"
+            placeholder="0" id="o_${p.id}" oninput="dirty('${esc(p.id)}')"></div>
+        </div>
+        <div class="fg">
+          <label>Valor Flete (precio neto)</label>
+          <div class="piw"><span class="pfx">$</span>
+          <input type="number" class="pifull${p.flete?' ok':''}" value="${p.flete}"
+            placeholder="0" id="pf_${p.id}" oninput="dirty('${esc(p.id)}')"></div>
+        </div>
+        <div class="fg">
+          <label>Comentarios / Stock / Condiciones</label>
+          <textarea class="cifull${p.comentario?' ok':''}" rows="2"
+            id="r_${p.id}" oninput="dirty('${esc(p.id)}')">${p.comentario}</textarea>
+        </div>
+      </div>
+
+      <div class="fbtns">
+        <button class="savebtn" id="btn_${p.id}" onclick="save('${esc(p.id)}')">💾 Guardar en planilla</button>
+        <button class="donebn" onclick="mkDone('${esc(p.id)}')">✓ Marcar cotizada</button>
+        <span class="sfb" id="fb_${p.id}">✓ Guardado en Google Sheets</span>
+      </div>
+    </div>
+  </div>`;
+}
+
+function tc(id){const c=document.getElementById('card_'+id);if(c)c.classList.toggle('open');}
+function dirty(id){const b=document.getElementById('btn_'+id);if(b)b.style.boxShadow='0 0 0 2px var(--acc)';}
+
+// ── GUARDAR ────────────────────────────────────────────────────────────────
+async function save(id){
+  const p=PROPUESTAS.find(x=>x.id===id);if(!p)return;
+  if(!tok){toast('Primero ingresa el token de Google arriba','e');return;}
+  const btn=document.getElementById('btn_'+id);
+  btn.textContent='⏳ Guardando...';btn.disabled=true;
+  try{
+    // Recopilar precios por ítem
+    const itemPrecios={};
+    let primerPrecio='';
+    p.items.forEach((_,idx)=>{
+      const n=document.getElementById(`in_${id}_${idx}`);
+      if(n){itemPrecios[idx]={n:n.value};if(idx===0)primerPrecio=n.value;}
+    });
+    const o=document.getElementById('o_'+id)?.value||'';
+    const pf=document.getElementById('pf_'+id)?.value||'';
+    const r=document.getElementById('r_'+id)?.value||'';
+
+    // Buscar fila en planilla de precios (col B = Código)
+    const sd=await apiFetch(`https://sheets.googleapis.com/v4/spreadsheets/${SID_PREC}/values/B2:B500`);
+    const rows=sd.values||[];
+    let rowNum=-1;
+    rows.forEach((row,i)=>{if((row[0]||'').trim()===id.trim())rowNum=i+2;});
+
+    // Armar nota con detalle de precios por ítem
+    const detalleItems=Object.entries(itemPrecios)
+      .filter(([,v])=>v.n)
+      .map(([k,v])=>`${p.items[k]?.medida} x${p.items[k]?.qty}: $${parseInt(v.n).toLocaleString('es-CL')}`)
+      .join(' | ');
+    const notaFinal=r+(detalleItems?'\n['+detalleItems+']':'');
+
+    if(rowNum>0){
+      await apiFetch(`https://sheets.googleapis.com/v4/spreadsheets/${SID_PREC}/values:batchUpdate`,{
+        method:'POST',
+        body:JSON.stringify({valueInputOption:'USER_ENTERED',data:[
+          {range:`N${rowNum}`,values:[[primerPrecio]]},
+          {range:`O${rowNum}`,values:[[o]]},
+          {range:`P${rowNum}`,values:[[pf]]},
+          {range:`R${rowNum}`,values:[[notaFinal]]},
+        ]})
+      });
+    } else {
+      await apiFetch(`https://sheets.googleapis.com/v4/spreadsheets/${SID_PREC}/values/A:S:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`,{
+        method:'POST',
+        body:JSON.stringify({values:[[
+          '','',p.org,p.cierre,'',p.vehiculo,'','','','','',id,'',
+          primerPrecio,o,pf,'',notaFinal,p.cotizada?'Cotizada':''
+        ]]})
+      });
+      toast('Nueva fila creada en la planilla');
+    }
+
+    // Actualizar estado local
+    p.precioServ=o;p.flete=pf;p.comentario=r;p.itemPrecios=itemPrecios;
+    cache[id]={precioNeto:primerPrecio,precioServ:o,flete:pf,comentario:r,itemPrecios,cotizada:p.cotizada};
+    localStorage.setItem('llp_pc',JSON.stringify(cache));
+
+    btn.style.boxShadow='';
+    const fb=document.getElementById('fb_'+id);
+    if(fb){fb.classList.add('show');setTimeout(()=>fb.classList.remove('show'),3000);}
+    toast('✓ Precios guardados en Google Sheets');
+  }catch(e){
+    toast('Error: '+e.message,'e');
+    if(e.message.includes('401'))toast('Token expirado — genera uno nuevo en OAuth Playground','e');
+  }finally{btn.textContent='💾 Guardar en planilla';btn.disabled=false;}
+}
+
+async function mkDone(id){
+  await save(id);
+  const p=PROPUESTAS.find(x=>x.id===id);
+  if(p){
+    p.cotizada=true;
+    cache[id]={...(cache[id]||{}),cotizada:true};
+    localStorage.setItem('llp_pc',JSON.stringify(cache));
+    render();stats();
+    toast('✓ Propuesta marcada como cotizada');
+  }
+}
+
+// ── INIT ───────────────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded',()=>{
+  if(tok){
+    document.getElementById('tok').value=tok;
+    document.getElementById('connbadge').classList.add('show');
+    document.getElementById('tokpanel').classList.add('conn');
+    document.getElementById('tokT').textContent='✓ Token configurado — listo para guardar';
+  }
+  render();
+  stats();
+  document.getElementById('upd').textContent='Plan de postulación V22 · 27/04/2026 · '+PROPUESTAS.length+' propuestas activas';
+});
+</script>
+</body>
